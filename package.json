@@ -28,5 +28,7 @@
     "lint": "eslint .",
     "build": "webpack",
     "setup": "node-lambda setup",
+    "execute": "node-lambda run -f deploy.env -H dist/bundle.handler",
+    "deploy": "node-lambda deploy -f deploy.env -H dist/bundle.handler"
   }
 }
