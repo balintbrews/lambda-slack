@@ -1,6 +1,7 @@
-event.json
 .env
 .lambda
 context.json
 deploy.env
+dist
+event.json
 node_modules
