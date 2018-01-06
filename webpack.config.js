@@ -1,16 +1,13 @@
 const path = require('path');
-const webpack = require('webpack');
-
 
 module.exports = {
-
   entry: './index.js',
   output: {
     path: path.join(__dirname, './dist'),
     filename: 'bundle.js',
-    libraryTarget: "commonjs2",
+    libraryTarget: 'commonjs2',
   },
-  target: "node",
+  target: 'node',
   module: {
     rules: [
       {
@@ -27,5 +24,8 @@ module.exports = {
       },
     ],
   },
-
+  // Workaround for https://github.com/sindresorhus/got/issues/345.
+  externals: {
+    electron: 'electron',
+  },
 };
