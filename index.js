@@ -1,36 +1,36 @@
-const url = require('url');
-const https = require('https');
+const got = require('got');
 
 const { slackWebhookUrl, slackChannel } = process.env;
 
-function postMessage(message, callback) {
-  const body = JSON.stringify(message);
-  const options = url.parse(slackWebhookUrl);
-  options.method = 'POST';
-  options.headers = {
-    'Content-Type': 'application/json',
-    'Content-Length': Buffer.byteLength(body),
-  };
-
-  const postReq = https.request(options, (res) => {
-    const chunks = [];
-    res.setEncoding('utf8');
-    res.on('data', chunk => chunks.push(chunk));
-    res.on('end', () => {
-      if (callback) {
-        callback({
-          body: chunks.join(''),
-          statusCode: res.statusCode,
-          statusMessage: res.statusMessage,
-        });
+/**
+ * Posts a message to Slack.
+ *
+ * @param {Object} message
+ *   Object describing the message to be sent to the Slack API.
+ * @param callback
+ *   Callback to return information to the Lambda caller.
+ */
+const post = function postMessageToSlack(message, callback) {
+  got.post(slackWebhookUrl, {
+    body: JSON.stringify(message),
+    headers: { 'content-type': 'application/json' },
+  })
+    .then((response) => {
+      console.log(response.response);
+      callback(null);
+    })
+    .catch((error) => {
+      if (error.response.statusCode < 500) {
+        console.error(`Error posting message to Slack API: ${error.response.statusCode} - ${error.response.statusMessage}`);
+        // Error is due to a problem with the request, invoke callback with
+        // null, so Lamdba will not retry.
+        callback(null);
+      } else {
+        // Invoke callback with a message and let Lamdba retry.
+        callback(`Server error when processing message: ${error.response.statusCode} - ${error.response.statusMessage}`);
       }
     });
-    return res;
-  });
-
-  postReq.write(body);
-  postReq.end();
-}
+};
 
 function processEvent(event, callback) {
   const buildArn = event.detail['build-id'];
@@ -101,21 +101,7 @@ function processEvent(event, callback) {
     }],
   };
 
-  postMessage(slackMessage, (response) => {
-    if (response.statusCode < 400) {
-      // eslint-disable-next-line no-console
-      console.info('Message posted successfully');
-      callback(null);
-    } else if (response.statusCode < 500) {
-      // eslint-disable-next-line no-console
-      console.error(`Error posting message to Slack API: ${response.statusCode} - ${response.statusMessage}`);
-      // Don't retry because the error is due to a problem with the request.
-      callback(null);
-    } else {
-      // Let Lambda retry
-      callback(`Server error when processing message: ${response.statusCode} - ${response.statusMessage}`);
-    }
-  });
+  post(slackMessage, callback);
 }
 
 exports.handler = (event, context, callback) => {

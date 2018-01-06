@@ -16,6 +16,9 @@
     }
   ],
   "license": "MIT",
+  "dependencies": {
+    "got": "^8.0"
+  },
   "devDependencies": {
     "eslint": "~4",
     "eslint-config-airbnb-base": "~12",
