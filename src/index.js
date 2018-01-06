@@ -1,14 +1,14 @@
+const config = require('../config.json');
 const got = require('got');
-
-const { slackWebhookUrl, slackChannel } = process.env;
+const _ = {
+  forOwn: require('lodash.forown'),
+  get: require('lodash.get'),
+};
 
 /**
- * Posts a message to Slack.
- *
- * @param {Object} message
- *   Object describing the message to be sent to the Slack API.
- * @param callback
- *   Callback to return information to the Lambda caller.
+ * Post a message to Slack.
+ * @param {Object} message - Object describing the message to be sent to the Slack API.
+ * @param {Function} callback - Callback to return information to the Lambda caller.
  */
 const post = function postMessageToSlack(message, callback) {
   got.post(slackWebhookUrl, {
@@ -32,78 +32,69 @@ const post = function postMessageToSlack(message, callback) {
     });
 };
 
-function processEvent(event, callback) {
-  const buildArn = event.detail['build-id'];
-  const buildId = buildArn.split('/').pop();
-  const buildUuid = buildId.split(':').pop();
-  const projectName = event.detail['project-name'];
-  const buildLink = `https://${event.region}.console.aws.amazon.com/codebuild/home?region=${event.region}#/builds/${encodeURI(buildId)}/view/new`;
-  const logLink = event.detail['additional-information'].logs['deep-link'];
+/**
+ * Extract value from object based on a path defined with dot notation, e.g.: $.prop-x.prop-y.
+ * @param {Object} obj - Object from where value should be extracted.
+ * @param {String} path - Path within object defined with dot notation, e.g.: $.prop-x.prop-y.
+ * @returns {*} - Value from object, e.g.: $.prop-x.prop-y → obj['prop-x']['prop-y'].
+ */
+const extractValue = function extractValue(obj, path) {
+  const pathArray = path.split('.');
+  pathArray.shift();
+  return _.get(obj, pathArray);
+};
 
-  const slackMessageContent = {};
-  switch (event.detail['build-status']) {
-    default:
-    case 'SUCCEEDED':
-      slackMessageContent.fallback = `New successful build for ${projectName}: ${buildUuid}.`;
-      slackMessageContent.pretext = `Look, there is a new successful build for ${projectName}! :sunglasses:`;
-      slackMessageContent.color = '#abc8b6';
-      slackMessageContent.status = 'Things look great! :+1:';
-      break;
-    case 'FAILED':
-      slackMessageContent.fallback = `New failed build for ${projectName}: ${buildUuid}.`;
-      slackMessageContent.pretext = `Oops, a failed build for ${projectName}! :thinking_face:`;
-      slackMessageContent.color = '#e8674a';
-      slackMessageContent.status = 'Something is wrong. :point_left:';
-      break;
-    case 'STOPPED':
-      slackMessageContent.fallback = `A build has been stopped for ${projectName}: ${buildUuid}.`;
-      slackMessageContent.pretext = `A build for ${projectName} has been stopped for some reason. :zipper_mouth_face:`;
-      slackMessageContent.color = '#f2cd90';
-      slackMessageContent.status = 'Not really sure. :construction:';
-      break;
-  }
+/**
+ * Match notification with payload.
+ * @param {Object} notification - Individual notification from configuration.
+ * @param {Object} payload - Event payload the Lambda function received.
+ * @returns {boolean} — Whether notification matches payload.
+ */
+const match = function matchNotificationWithPayload(notification, payload) {
+  let matchesAll = true;
+  _.forOwn(notification.match, (values, path) => {
+    if (!values.includes(extractValue(payload, path))) {
+      matchesAll = false;
+    }
+  });
+  return matchesAll;
+};
 
-  const slackMessage = {
-    channel: slackChannel,
-    username: 'Relevant Builds',
-    icon_url: 'https://s3.us-east-2.amazonaws.com/relevantbits-assets/logo-aws-codebuild.png',
-    attachments: [{
-      fallback: slackMessageContent.fallback,
-      color: slackMessageContent.color,
-      pretext: slackMessageContent.pretext,
-      fields: [
-        {
-          title: 'Project',
-          value: projectName,
-          short: false,
-        },
-        {
-          title: 'Status',
-          value: slackMessageContent.status,
-          short: false,
-        },
-        {
-          title: 'Build',
-          value: `<${buildLink}|View build>`,
-          short: true,
-        },
-        {
-          title: 'Full log',
-          value: `<${logLink}|View full log>`,
-          short: true,
-        },
-        {
-          title: 'Build ID',
-          value: buildId,
-          short: false,
-        },
-      ],
-    }],
-  };
+/**
+ * Pick the appropriate notification from config based on matching rules.
+ * @param {Object} payload - Event payload the Lambda function received.
+ * @returns {(Object)|boolean} - Matching notification object from configuration.
+ */
+const pick = function pickNotification(payload) {
+  let pickedNotification = false;
+    _.forOwn(config, (notification) => {
+    if (Object.prototype.hasOwnProperty.call(notification, 'match')) {
+      if (match(notification, payload)) {
+        pickedNotification = notification;
+        return false;
+      }
+    } else {
+      pickedNotification = notification;
+      return false;
+    }
+  });
+  return pickedNotification;
+};
 
-  post(slackMessage, callback);
-}
+/**
+ * Process Lambda event.
+ * @param {Object} event - Event payload the Lambda function received.
+ * @param {Function} callback - Callback to return information to the Lambda caller.
+ */
+const process = function processEvent(event, callback) {
+  const slackMessage = {};
+  const notification = pick(event);
+
+  console.log(notification);
+  console.log(slackMessage);
+  // post(slackMessage, callback);
+};
 
 exports.handler = (event, context, callback) => {
-  processEvent(event, callback);
+  process(event, callback);
 };

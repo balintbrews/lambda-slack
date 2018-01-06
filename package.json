@@ -17,7 +17,10 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "got": "^8.0"
+    "got": "^8.0",
+    "lodash.forown": "^4.4.0",
+    "lodash.get": "^4.4.2",
+    "lodash.replace": "^4.1.4"
   },
   "devDependencies": {
     "eslint": "~4",
