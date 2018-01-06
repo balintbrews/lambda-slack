@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Build Notification",
+    "match": {
+      "$.source": ["aws.codebuild"],
+      "$.detail-type": ["CodeBuild Build State Change"]
+    },
+    "inputTransform": {
+      "project": "$.detail.project-name",
+      "status": "$.detail.build-status",
+      "aws-region": "$.region",
+      "log-stream-name": "$.detail.additional-information.logs.stream-name",
+      "color": {
+        "#abc8b6": {"$.detail.build-status": ["IN_PROGRESS", "SUCCEEDED"]},
+        "#e8674a": {"$.detail.build-status": ["FAILED"]},
+        "#f2cd90": {"$.detail.build-status": ["STOPPED"]}
+      }
+    },
+    "slackMessage": {
+      "webhook": "https://hooks.slack.com/services/xyz/xyz/xyz",
+      "channel": "builds",
+      "username": "notification bot",
+      "icon-url": "https://png.icons8.com/ultraviolet/540/bot.png",
+      "color": "<color>",
+      "attachments": [{
+        "fallback": "Build <status> for project: <project>.",
+        "pretext": "Build <status> for project: <project>.",
+        "fields": [
+          {
+            "title": "Build run",
+            "value": "<https://<aws-region>.console.aws.amazon.com/codebuild/home?region=<aws-region>#/builds/<project>/<log-stream-name>/view/new|<project>:<log-stream-name>>"
+          }
+        ]
+      }]
+    }
+  }
+]
