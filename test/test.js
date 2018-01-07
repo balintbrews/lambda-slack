@@ -1,5 +1,6 @@
 const should = require('chai').should;
 
+const createVariables = require('../src/lib/create_variables');
 const extractValue = require('../src/lib/extract');
 const match = require('../src/lib/match');
 const pick = require('../src/lib/pick');
@@ -216,4 +217,56 @@ describe('lambda-slack', () => {
     });
   });
 
+  describe('Creating variables', () => {
+    it('creates variables from simple path definitions', () => {
+      const config = {
+        status: '$.detail.build-status',
+        project: '$.detail.project-name'
+      };
+      const payload = {
+        detail: {
+          'build-status': 'IN_PROGRESS',
+          'project-name': 'lambda-slack',
+        },
+      };
+      const variables = createVariables(config, payload);
+      variables.should.be.an('object');
+      variables.should.eql({ status: 'IN_PROGRESS', project: 'lambda-slack' });
+    });
+
+    it('creates variables from definitions with match rules', () => {
+      const config = {
+        color: {
+          green: {
+            match: {
+              '$.detail.build-status': ['IN_PROGRESS', 'SUCCEEDED']
+            }
+          },
+          red: {
+            match: {
+              '$.detail.build-status': ['FAILED']
+            }
+          },
+          yellow: {
+            match: {
+              '$.detail.build-status': ['STOPPED']
+            }
+          },
+        },
+      };
+      const payload = {
+        detail: { 'build-status': 'IN_PROGRESS' },
+      };
+      const variables = createVariables(config, payload);
+      variables.should.be.an('object');
+      variables.should.eql({ color: 'green' });
+    });
+
+    it('throws error when definition of a variable is not a string or an object', () => {
+      const config = [{
+        project: ['foo'],
+      }];
+      (() => {match(config, {})}).should.throw(Error);
+    });
+  });
 });

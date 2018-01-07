@@ -11,10 +11,23 @@
       "aws-region": "$.region",
       "log-stream-name": "$.detail.additional-information.logs.stream-name",
       "color": {
-        "#abc8b6": {"$.detail.build-status": ["IN_PROGRESS", "SUCCEEDED"]},
-        "#e8674a": {"$.detail.build-status": ["FAILED"]},
-        "#f2cd90": {"$.detail.build-status": ["STOPPED"]}
+        "#abc8b6": {
+          "match": {
+            "$.detail.build-status": ["IN_PROGRESS", "SUCCEEDED"]
+          }
+        },
+        "#e8674a": {
+          "match": {
+            "$.detail.build-status": ["FAILED"]
+          }
+        },
+        "#f2cd90": {
+          "match": {
+            "$.detail.build-status": ["STOPPED"]
+          }
+        }
       }
+    },
     },
     "slackMessage": {
       "webhook": "https://hooks.slack.com/services/xyz/xyz/xyz",
