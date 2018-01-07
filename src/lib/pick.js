@@ -12,6 +12,9 @@ const _ = {
 const match = function matchNotificationWithPayload(notification, payload) {
   let matchesAll = true;
   _.for(notification.match, (values, path) => {
+    if (typeof values === 'string') {
+      throw Error(`Value to match "${values}" is not wrapped in an array.`);
+    }
     if (!values.includes(extractValue(payload, path))) {
       matchesAll = false;
     }
@@ -20,7 +23,7 @@ const match = function matchNotificationWithPayload(notification, payload) {
 };
 
 /**
- * Pick the appropriate notification from config based on matching rules.
+ * Pick the appropriate notification from config based on match rules.
  * @param {Object} payload - Event payload the Lambda function received.
  * @param {Object} notificationsConfig - Configuration of all notifications.
  * @returns {(Object)|boolean} - Matching notification object from configuration.

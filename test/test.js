@@ -27,6 +27,10 @@ describe('lambda-slack', () => {
       extractValue(obj, '$.nested.deeper.gamma').should.equal('γ');
       extractValue(obj, '$.nested.deeper.evenDeeper.delta').should.equal('δ');
     });
+
+    it('throws error when path is defined without the preceding `$` symbol', () => {
+      (() => {extractValue({}, 'alpha')}).should.throw(Error);
+    });
   });
 
   describe('Picking notification', () => {
@@ -140,6 +144,15 @@ describe('lambda-slack', () => {
       notification.should.be.an('object');
       notification.should.have.property('name');
       notification.name.should.equal('Build Notification — first');
+    });
+
+    it('throws error when value in match rule is not wrapped in an array', () => {
+      const config = [{
+        match: {
+          '$.source': 'aws.codebuild',
+        },
+      }];
+      (() => {pick({}, config)}).should.throw(Error);
     });
   });
 
