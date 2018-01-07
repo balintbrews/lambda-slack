@@ -29,7 +29,7 @@ const _ = {
  *   }
  * @param {Object} variablesConfig - Configuration describing input transforms.
  * @param {Object} payload - Event payload the Lambda function received.
- * @return {Object} - Human-friendly variables with extracted values.
+ * @returns {Object} - Human-friendly variables with extracted values.
  */
 const createVariables = function createVariablesFromPayload(variablesConfig, payload) {
   const variables = {};

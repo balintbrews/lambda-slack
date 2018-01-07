@@ -4,6 +4,7 @@ const createVariables = require('../src/lib/create_variables');
 const extractValue = require('../src/lib/extract');
 const match = require('../src/lib/match');
 const pick = require('../src/lib/pick');
+const replace = require('../src/lib/replace');
 
 describe('lambda-slack', () => {
 
@@ -267,6 +268,47 @@ describe('lambda-slack', () => {
         project: ['foo'],
       }];
       (() => {match(config, {})}).should.throw(Error);
+    });
+  });
+
+  describe('Replacing variables', () => {
+    it('correctly replaces variables in an object', () => {
+      const config = {
+        attachments: [{
+          pretext: 'New build for <project>.',
+          fields: [
+            {
+              title: 'Status',
+              value: '<status>'
+            },
+            {
+              title: 'Build ID',
+              value: '<build-id>'
+            },
+          ]
+        }],
+      };
+      const variables = {
+        project: 'lambda-slack',
+        'build-id': '1x2y3z4',
+        status: 'SUCCEEDED',
+      };
+      const replacedConfig = replace(config, variables);
+      replacedConfig.should.eql({
+        attachments: [{
+          pretext: 'New build for lambda-slack.',
+          fields: [
+            {
+              title: 'Status',
+              value: 'SUCCEEDED'
+            },
+            {
+              title: 'Build ID',
+              value: '1x2y3z4'
+            },
+          ]
+        }],
+      });
     });
   });
 });
