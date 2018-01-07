@@ -1,5 +1,7 @@
 const should = require('chai').should;
+
 const extractValue = require('../src/lib/extract');
+const match = require('../src/lib/match');
 const pick = require('../src/lib/pick');
 
 describe('lambda-slack', () => {
@@ -33,12 +35,79 @@ describe('lambda-slack', () => {
     });
   });
 
+  describe('Matching rules', () => {
+    it('returns true for a single rule with a single value, matching', () => {
+      const config = {
+        '$.source': ['aws.codebuild'],
+      };
+      const payload = { source: 'aws.codebuild' };
+      match(config, payload).should.equal(true);
+    });
+
+    it('returns false for a single rule with a single value, non-matching', () => {
+      const config = {
+        '$.source': ['aws.codepipeline'],
+      };
+      const payload = { source: 'aws.codebuild' };
+      match(config, payload).should.equal(false);
+    });
+
+    it('returns true for a single rule with multiple values, one of them matching', () => {
+      const config = {
+        '$.source': ['aws.codebuild', 'aws.codepipeline'],
+      };
+      const payload = { source: 'aws.codebuild' };
+      match(config, payload).should.equal(true);
+    });
+
+    it('returns false for a single rule with multiple values, none of them matching', () => {
+      const config = {
+        '$.source': ['aws.cloudwatch', 'foobar'],
+      };
+      const payload = { source: 'aws.codebuild' };
+      match(config, payload).should.equal(false);
+    });
+
+    it('returns true for multiple rules, all of them matching', () => {
+      const config = {
+        '$.source': ['aws.codebuild', 'aws.codepipeline'],
+        '$.detail-type': ['CodeBuild Build State Change'],
+      };
+      const payload = {
+        source: 'aws.codebuild',
+        'detail-type': 'CodeBuild Build State Change',
+      };
+      match(config, payload).should.equal(true);
+    });
+
+    it('returns false for multiple rules, not all of them matching', () => {
+      const config = {
+        '$.source': ['aws.codebuild', 'aws.codepipeline'],
+        '$.detail-type': ['CodeBuild Build State Change'],
+      };
+      const payload = {
+        source: 'aws.codebuild',
+        'detail-type': 'CodeBuild Build Phase Change',
+      };
+      match(config, payload).should.equal(false);
+    });
+
+    it('throws error when value in match rule is not wrapped in an array', () => {
+      const config = [{
+        match: {
+          '$.source': 'aws.codebuild',
+        },
+      }];
+      (() => {pick(config, {})}).should.throw(Error);
+    });
+  });
+
   describe('Picking notification', () => {
     it('picks notification without match rules', () => {
       const config = [{
         'name': 'Notification without match rules',
       }];
-      const notification = pick({}, config);
+      const notification = pick(config, {});
       notification.should.be.an('object');
       notification.should.have.property('name');
       notification.name.should.equal('Notification without match rules');
@@ -50,7 +119,7 @@ describe('lambda-slack', () => {
         match: { '$.source': ['aws.codebuild'] },
       }];
       const payload = { source: 'aws.codebuild' };
-      const notification = pick(payload, config);
+      const notification = pick(config, payload);
       notification.should.be.an('object');
       notification.should.have.property('name');
       notification.name.should.equal('Build Notification');
@@ -61,7 +130,7 @@ describe('lambda-slack', () => {
         match: { '$.source': ['aws.codepipeline'] },
       }];
       const payload = { source: 'aws.codebuild' };
-      const notification = pick(payload, config);
+      const notification = pick(config, payload);
       notification.should.be.a('boolean');
       notification.should.equal(false);
     });
@@ -74,7 +143,7 @@ describe('lambda-slack', () => {
         },
       }];
       const payload = { source: 'aws.codebuild' };
-      const notification = pick(payload, config);
+      const notification = pick(config, payload);
       notification.should.be.an('object');
       notification.should.have.property('name');
       notification.name.should.equal('Build Notification');
@@ -92,7 +161,7 @@ describe('lambda-slack', () => {
         source: 'aws.codebuild',
         'detail-type': 'CodeBuild Build Phase Change',
       };
-      const notification = pick(payload, config);
+      const notification = pick(config, payload);
       notification.should.be.a('boolean');
       notification.should.equal(false);
     });
@@ -118,7 +187,7 @@ describe('lambda-slack', () => {
         source: 'aws.codebuild',
         'detail-type': 'CodeBuild Build State Change',
       };
-      const notification = pick(payload, config);
+      const notification = pick(config, payload);
       notification.should.be.an('object');
       notification.should.have.property('name');
       notification.name.should.equal('Build State Notification');
@@ -140,19 +209,10 @@ describe('lambda-slack', () => {
         }
       ];
       const payload = { source: 'aws.codebuild' };
-      const notification = pick(payload, config);
+      const notification = pick(config, payload);
       notification.should.be.an('object');
       notification.should.have.property('name');
       notification.name.should.equal('Build Notification — first');
-    });
-
-    it('throws error when value in match rule is not wrapped in an array', () => {
-      const config = [{
-        match: {
-          '$.source': 'aws.codebuild',
-        },
-      }];
-      (() => {pick({}, config)}).should.throw(Error);
     });
   });
 
