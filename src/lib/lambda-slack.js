@@ -10,6 +10,7 @@ const replace = require('./replace');
  * @param {Function} callback - Callback to return information to the Lambda caller.
  */
 const lamdbaSlack = function processEvent(event, callback) {
+  console.log('Received event:', JSON.stringify(event, null, 2));
   const notification = pick(config, event);
   if (notification === false) {
     console.log('No notification has been sent.');
