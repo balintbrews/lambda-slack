@@ -1,6 +1,6 @@
 const { should } = require('chai');
 
-const createVariables = require('../src/lib/create_variables');
+const createVariables = require('../src/lib/variables');
 const extractValue = require('../src/lib/extract');
 const match = require('../src/lib/match');
 const pick = require('../src/lib/pick');
