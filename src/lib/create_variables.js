@@ -1,7 +1,9 @@
+const lodashForOwn = require('lodash.forown');
 const extractValue = require('./extract');
 const match = require('./match');
+
 const _ = {
-  for: require('lodash.forown'),
+  for: lodashForOwn,
 };
 
 /**

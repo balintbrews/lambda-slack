@@ -1,7 +1,11 @@
+const lodashAssignIn = require('lodash.assignin');
+const lodashForOwn = require('lodash.forown');
+const lodashMapValues = require('lodash.mapvalues');
+
 const _ = {
-  assignIn: require('lodash.assignin'),
-  for: require('lodash.forown'),
-  mapValues: require('lodash.mapvalues'),
+  assignIn: lodashAssignIn,
+  for: lodashForOwn,
+  mapValues: lodashMapValues,
 };
 
 /**

@@ -1,5 +1,7 @@
+const lodashGet = require('lodash.get');
+
 const _ = {
-  get: require('lodash.get'),
+  get: lodashGet,
 };
 
 /**
