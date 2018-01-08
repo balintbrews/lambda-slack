@@ -10,8 +10,8 @@
     "lodash.forown": "^4.4.0",
     "lodash.get": "^4.4.2",
     "lodash.mapvalues": "^4.6.0",
-    "lodash.replace": "^4.1.4"
     "lodash.replace": "^4.1.4",
+    "serverless": "^1.25.0",
     "zip-webpack-plugin": "^2.1.0",
     "webpack": "~3.10"
   },
@@ -21,12 +21,11 @@
     "eslint-config-airbnb-base": "~12",
     "eslint-loader": "~1.9",
     "eslint-plugin-import": "~2.8",
-    "mocha": "^4.1",
-    "webpack": "~3.10"
     "mocha": "^4.1"
   },
   "scripts": {
     "build": "webpack",
+    "deploy": "webpack && serverless deploy function --function lambda-slack",
     "lint": "eslint .",
     "test": "mocha"
   }

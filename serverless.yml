@@ -1,0 +1,14 @@
+service: lambda-slack
+
+provider:
+  name: aws
+  versionFunctions: false
+  region: us-east-2
+functions:
+  lambda-slack:
+    name: slackNotifications
+    package:
+      artifact: dist/bundle.js.zip
+    handler: bundle.handler
+    runtime: nodejs6.10
+    memorySize: 256
