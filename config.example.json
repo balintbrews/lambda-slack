@@ -5,7 +5,7 @@
       "$.source": ["aws.codebuild"],
       "$.detail-type": ["CodeBuild Build State Change"]
     },
-    "inputTransform": {
+    "variables": {
       "project": "$.detail.project-name",
       "status": "$.detail.build-status",
       "aws-region": "$.region",
@@ -28,16 +28,15 @@
         }
       }
     },
-    },
     "slackMessage": {
       "webhook": "https://hooks.slack.com/services/xyz/xyz/xyz",
       "channel": "builds",
       "username": "notification bot",
-      "icon-url": "https://png.icons8.com/ultraviolet/540/bot.png",
-      "color": "<color>",
+      "icon_url": "https://png.icons8.com/ultraviolet/540/bot.png",
       "attachments": [{
         "fallback": "Build <status> for project: <project>.",
         "pretext": "Build <status> for project: <project>.",
+        "color": "<color>",
         "fields": [
           {
             "title": "Build run",
