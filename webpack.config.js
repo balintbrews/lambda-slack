@@ -1,4 +1,5 @@
 const path = require('path');
+const ZipPlugin = require('zip-webpack-plugin');
 
 module.exports = {
   entry: './src/index.js',
@@ -24,6 +25,9 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+    new ZipPlugin({}),
+  ],
   // Workaround for https://github.com/sindresorhus/got/issues/345.
   externals: {
     electron: 'electron',
