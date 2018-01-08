@@ -1,10 +1,3 @@
-# `aws-lambda-cloudwatch-slack`
+# lambda-slack
 
-Node.js code for an AWS Lambda function to send notifications on Slack about events occurring in AWS CodeBuild.
-
-## Setup
-
-Set these environment variables in your Lambda function config:
-
-* `slackWebhookUrl`
-* `slackChannel`
+AWS Lambda function for sending highly customizable messages to Slack using data from any kind of payload, i.e. CloudWatch events or HTTP requests received on API Gateway endpoints.
