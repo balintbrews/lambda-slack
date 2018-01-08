@@ -38,18 +38,17 @@ const createVariables = function createVariablesFromPayload(variablesConfig, pay
   _.for(variablesConfig, (def, variableName) => {
     if (typeof def === 'string') {
       variables[variableName] = extractValue(payload, def);
-    }
-    else if (typeof def === 'object') {
+    } else if (typeof def === 'object') {
       let valueToAssign = '';
       _.for(def, (rule, value) => {
         if (match(rule.match, payload)) {
           valueToAssign = value;
           return false;
         }
+        return true;
       });
       variables[variableName] = valueToAssign;
-    }
-    else {
+    } else {
       throw Error('Definition of a variable should be either a path or an object with multiple match rules.');
     }
   });

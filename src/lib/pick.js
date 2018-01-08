@@ -23,6 +23,7 @@ const pick = function pickNotification(notificationsConfig, payload) {
       pickedNotification = notification;
       return false;
     }
+    return true;
   });
   return pickedNotification;
 };

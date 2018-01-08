@@ -25,22 +25,15 @@ const adjustVariableNames = function adjustVariableNamesWithEnclosingSigns(varia
  * Manipulates all properties of an object recursively.
  * (Simplified version of lodash-deep 2.0.0.)
  * @param {Object} obj - Object to manipulate.
- * @param {Function} cb - Callback function that is supposed to return the new value for each property.
+ * @param {Function} cb - Callback function returning the new value for each property.
  */
 const map = function deepMapValues(obj, cb) {
-  if (typeof obj === 'object') {
-    return _.assignIn(obj, _.mapValues(obj, (values) => {
-      return map(values, cb);
-    }));
+  if (obj instanceof Object) {
+    return _.assignIn(obj, _.mapValues(obj, values => map(values, cb)));
+  } else if (obj instanceof Array) {
+    _.for(obj, values => map(values, cb));
   }
-  else if (obj instanceof Array) {
-    _.for(obj, (values) => {
-      return map(values, cb);
-    });
-  }
-  else {
-    return cb(obj);
-  }
+  return cb(obj);
 };
 
 /**
@@ -55,11 +48,7 @@ const replace = function replaceVariablesInObject(obj, variables) {
   // Clone the object.
   const replacedObject = JSON.parse(JSON.stringify(obj));
   // Iterate over the object recursively, replace variables on all levels.
-  map(replacedObject, (value) => {
-    return value.replace(regex, (matched) => {
-      return newVariables[matched];
-    });
-  });
+  map(replacedObject, value => value.replace(regex, matched => newVariables[matched]));
   return replacedObject;
 };
 

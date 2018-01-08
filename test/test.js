@@ -1,4 +1,4 @@
-const should = require('chai').should;
+const { should } = require('chai');
 
 const createVariables = require('../src/lib/create_variables');
 const extractValue = require('../src/lib/extract');
@@ -7,13 +7,12 @@ const pick = require('../src/lib/pick');
 const replace = require('../src/lib/replace');
 
 describe('lambda-slack', () => {
-
   before(() => {
     should();
   });
 
   describe('Extracting values', () => {
-    it ('returns correct value from object based on path defined with dot notation (and a preceding `$` symbol)', () => {
+    it('returns correct value from object based on path defined with dot notation (and a preceding `$` symbol)', () => {
       const obj = {
         alpha: 'α',
         nested: {
@@ -23,7 +22,7 @@ describe('lambda-slack', () => {
             evenDeeper: {
               delta: 'δ',
             },
-          }
+          },
         },
       };
       extractValue(obj, '$.alpha').should.equal('α');
@@ -33,7 +32,7 @@ describe('lambda-slack', () => {
     });
 
     it('throws error when path is defined without the preceding `$` symbol', () => {
-      (() => {extractValue({}, 'alpha')}).should.throw(Error);
+      (() => { extractValue({}, 'alpha'); }).should.throw(Error);
     });
   });
 
@@ -100,14 +99,14 @@ describe('lambda-slack', () => {
           '$.source': 'aws.codebuild',
         },
       }];
-      (() => {pick(config, {})}).should.throw(Error);
+      (() => { pick(config, {}); }).should.throw(Error);
     });
   });
 
   describe('Picking notification', () => {
     it('picks notification without match rules', () => {
       const config = [{
-        'name': 'Notification without match rules',
+        name: 'Notification without match rules',
       }];
       const notification = pick(config, {});
       notification.should.be.an('object');
@@ -183,7 +182,7 @@ describe('lambda-slack', () => {
             '$.source': ['aws.codebuild'],
             '$.detail-type': ['CodeBuild Build State Change'],
           },
-        }
+        },
       ];
       const payload = {
         source: 'aws.codebuild',
@@ -208,7 +207,7 @@ describe('lambda-slack', () => {
           match: {
             '$.source': ['aws.codebuild'],
           },
-        }
+        },
       ];
       const payload = { source: 'aws.codebuild' };
       const notification = pick(config, payload);
@@ -222,7 +221,7 @@ describe('lambda-slack', () => {
     it('creates variables from simple path definitions', () => {
       const config = {
         status: '$.detail.build-status',
-        project: '$.detail.project-name'
+        project: '$.detail.project-name',
       };
       const payload = {
         detail: {
@@ -240,18 +239,18 @@ describe('lambda-slack', () => {
         color: {
           green: {
             match: {
-              '$.detail.build-status': ['IN_PROGRESS', 'SUCCEEDED']
-            }
+              '$.detail.build-status': ['IN_PROGRESS', 'SUCCEEDED'],
+            },
           },
           red: {
             match: {
-              '$.detail.build-status': ['FAILED']
-            }
+              '$.detail.build-status': ['FAILED'],
+            },
           },
           yellow: {
             match: {
-              '$.detail.build-status': ['STOPPED']
-            }
+              '$.detail.build-status': ['STOPPED'],
+            },
           },
         },
       };
@@ -267,7 +266,7 @@ describe('lambda-slack', () => {
       const config = [{
         project: ['foo'],
       }];
-      (() => {match(config, {})}).should.throw(Error);
+      (() => { match(config, {}); }).should.throw(Error);
     });
   });
 
@@ -279,13 +278,13 @@ describe('lambda-slack', () => {
           fields: [
             {
               title: 'Status',
-              value: '<status>'
+              value: '<status>',
             },
             {
               title: 'Build ID',
-              value: '<build-id>'
+              value: '<build-id>',
             },
-          ]
+          ],
         }],
       };
       const variables = {
@@ -300,13 +299,13 @@ describe('lambda-slack', () => {
           fields: [
             {
               title: 'Status',
-              value: 'SUCCEEDED'
+              value: 'SUCCEEDED',
             },
             {
               title: 'Build ID',
-              value: '1x2y3z4'
+              value: '1x2y3z4',
             },
-          ]
+          ],
         }],
       });
     });
