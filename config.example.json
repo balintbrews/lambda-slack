@@ -1,5 +1,67 @@
 [
   {
+    "name": "Pipeline Stage Notification",
+    "match": {
+      "$.source": ["aws.codepipeline"],
+      "$.detail-type": ["CodePipeline Stage Execution State Change"]
+    },
+    "variables": {
+      "pipeline": "$.detail.pipeline",
+      "stage": {
+        "Build": {
+          "match": {
+            "$.detail.stage": ["Build"]
+          }
+        },
+        "Deployment": {
+          "match": {
+            "$.detail.stage": ["Staging"]
+          }
+        }
+      },
+      "state": "$.detail.state",
+      "color": {
+        "good": {
+          "match": {
+            "$.detail.state": ["SUCCEEDED"]
+          }
+        },
+        "danger": {
+          "match": {
+            "$.detail.state": ["FAILED"]
+          }
+        },
+        "warning": {
+          "match": {
+            "$.detail.state": ["CANCELED"]
+          }
+        }
+      }
+    },
+    "slackMessage": {
+      "webhook": "https://hooks.slack.com/services/xyz/xyz/xyz",
+      "channel": "builds",
+      "username": "notification bot",
+      "icon_url": "https://png.icons8.com/ultraviolet/540/bot.png",
+      "attachments": [{
+        "fallback": "<stage>: <state> in <pipeline> pipeline.",
+        "color": "<color>",
+        "fields": [
+          {
+            "title": "Pipeline",
+            "value": "<pipeline>: <stage>",
+            "short": true
+          },
+          {
+            "title": "State",
+            "value": "<state>",
+            "short": true
+          }
+        ]
+      }]
+    }
+  },
+  {
     "name": "Build Notification",
     "match": {
       "$.source": ["aws.codebuild"],
@@ -11,17 +73,17 @@
       "aws-region": "$.region",
       "log-stream-name": "$.detail.additional-information.logs.stream-name",
       "color": {
-        "#abc8b6": {
+        "good": {
           "match": {
-            "$.detail.build-status": ["IN_PROGRESS", "SUCCEEDED"]
+            "$.detail.build-status": ["SUCCEEDED"]
           }
         },
-        "#e8674a": {
+        "danger": {
           "match": {
             "$.detail.build-status": ["FAILED"]
           }
         },
-        "#f2cd90": {
+        "warning": {
           "match": {
             "$.detail.build-status": ["STOPPED"]
           }
@@ -34,13 +96,18 @@
       "username": "notification bot",
       "icon_url": "https://png.icons8.com/ultraviolet/540/bot.png",
       "attachments": [{
-        "fallback": "Build <status> for project: <project>.",
-        "pretext": "Build <status> for project: <project>.",
+        "fallback": "Build <status> for <project> project.",
         "color": "<color>",
         "fields": [
           {
-            "title": "Build run",
-            "value": "<https://<aws-region>.console.aws.amazon.com/codebuild/home?region=<aws-region>#/builds/<project>/<log-stream-name>/view/new|<project>:<log-stream-name>>"
+            "title": "Build",
+            "value": "<project> (<https://<aws-region>.console.aws.amazon.com/codebuild/home?region=<aws-region>#/builds/<project>:<log-stream-name>/view/new|view build run>)",
+            "short": true
+          },
+          {
+            "title": "Status",
+            "value": "<status>",
+            "short": true
           }
         ]
       }]
