@@ -286,6 +286,7 @@ describe('lambda-slack', () => {
             },
           ],
         }],
+        mrkdwn: true,
       };
       const variables = {
         project: 'lambda-slack',
@@ -307,6 +308,7 @@ describe('lambda-slack', () => {
             },
           ],
         }],
+        mrkdwn: true,
       });
     });
   });

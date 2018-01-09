@@ -48,7 +48,12 @@ const replace = function replaceVariablesInObject(obj, variables) {
   // Clone the object.
   const replacedObject = JSON.parse(JSON.stringify(obj));
   // Iterate over the object recursively, replace variables on all levels.
-  map(replacedObject, value => value.replace(regex, matched => newVariables[matched]));
+  map(replacedObject, (value) => {
+    if (typeof value === 'string') {
+      return value.replace(regex, matched => newVariables[matched]);
+    }
+    return value;
+  });
   return replacedObject;
 };
 
