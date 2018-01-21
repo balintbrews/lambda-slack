@@ -178,3 +178,27 @@ Now you're ready to deploy your function using [Serverless](https://serverless.c
 (Or if you prefer, use `$ yarn deploy`.)
 
 With this single command you can deploy a new version of your function. Whenever you change your configuration just issue this command, and your function will be shipped to AWS Lambda in a few seconds.
+
+## Development
+
+### Bundling
+
+Code for the function is bundled into a single file and compressed into a zipfile using webpack, so that it's extremely fast to deploy:
+
+	❯ npm run build
+
+### Linting
+
+Code is linted with ESLint using `eslint-config-airbnb-base`:
+
+	❯ npm run lint
+
+#### Testing
+
+Tests are written with Mocha and Chai:
+
+	❯ npm run test
+
+## License
+
+MIT
