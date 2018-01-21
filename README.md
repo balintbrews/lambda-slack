@@ -148,4 +148,33 @@ With *path definitions* and *match rules* we have established a vocabulary to de
     }]
   }
 }
-```
+``````
+
+## Testing
+
+After creating your config file, you can do a test run locally using a sample JSON-formatted payload file. There are samples in the repository, but you can create the payload file for yourself to match your events that you will be receiving.
+
+To perform a test run, issue the following command:
+
+	❯ node src/test_run.js path-to-payload.json
+
+## Deployment to AWS Lambda
+
+### Initial setup
+
+1. Ensure that you have an AWS account set up. If you're new to Amazon Web Services, you need to put in a credit card, otherwise you may not be able to deploy your function. AWS Lambda is part of the non-expiring [AWS Free Tier](https://aws.amazon.com/free/#AWS_FREE_TIER). Please be sure that you understand the details of the free tier for AWS Lambda.
+2. [Create a new Lambda function](https://docs.aws.amazon.com/lambda/latest/dg/get-started-create-function.html) in the **US East (Ohio) region** (`us-east-2`) named **`slackNotifications`**. (If you wish to change these values, override them in `serverless.yml`. *@todo Make this configurable.*) You don't need to add code to the function—that part is automated.
+3. Make sure you have [an IAM user](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#create-iam-users) and you obtained the [access key ID and secret access key](https://docs.aws.amazon.com/general/latest/gr/aws-access-keys-best-practices.html) for the user account.
+4. Execute the following command with your own access keys to set up an AWS profile:
+
+		❯ ./node_modules/serverless/bin/serverless config credentials --provider aws --key AKIAIOSFODNN7EXAMPLE --secret wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+Now you're ready to deploy your function using [Serverless](https://serverless.com). You can forget about the above steps, things will get much simpler from here.
+
+### Deployment
+
+	❯ npm run deploy
+
+(Or if you prefer, use `$ yarn deploy`.)
+
+With this single command you can deploy a new version of your function. Whenever you change your configuration just issue this command, and your function will be shipped to AWS Lambda in a few seconds.
