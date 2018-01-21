@@ -1,7 +1,7 @@
 {
   "name": "lambda-slack",
   "version": "0.0.1",
-  "description": "AWS Lambda function for sending highly customizable messages to Slack using data from any kind of payload, i.e. CloudWatch events or HTTP requests received on API Gateway endpoints.",
+  "description": "AWS Lambda function for sending highly customizable messages to Slack using data from any kind of payload, i.e. CloudWatch events or HTTP requests received through API Gateway endpoints.",
   "repository": "http://github.com/balintk/lambda-slack",
   "license": "MIT",
   "dependencies": {
