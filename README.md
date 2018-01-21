@@ -51,14 +51,14 @@ E.g. consider the following payload:
   "project": {
     "id": "acme",
     "name": "Acme App"
-  }
+  },
   "event": "build",
   "details": {
-    "status: "success"
+    "status": "success"
   }
 }
 ```
-To extract all values the following path definitions can be defined:
+To extract all values these path definitions can be defined:
 
 * `$.project.id`;
 * `$.project.name`;
@@ -77,7 +77,7 @@ An example match rules definition would be:
 }
 ```
 
-These match rules would return `TRUE` with the above payload.
+These match rules would return `true` with the above payload.
 
 Match rules are defined as an object. Keys describe paths within the payload where values should be checked. They are expressed with the dot notation and a preceding `$` symbol. Values should be arrays containing the possible values. If any of the values are found at the path the key defines, the rule will return `true`. All rules need to return `true` in order to have a `true` returned as the result of the evaluation. (In other words match rules are evaluated with the logical `AND` operator, but values inside rules are checked with `OR`.)
 
