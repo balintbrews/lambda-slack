@@ -31,7 +31,7 @@ Check out [`config.example.json`](https://github.com/balintk/lambda-slack/blob/m
 
 `lambda-slack` utilizes [Serverless](https://serverless.com) under the hood to faciliate easy and quick deployments to AWS Lambda.
 
-## Usage
+## Configuration
 
 After cloning the repository from GitHub, you will only need to create a single config file named **`config.json`**. (Copying the `config.example.json` file might be a good start.)
 
