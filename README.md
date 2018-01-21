@@ -4,7 +4,7 @@ AWS Lambda function for sending highly customizable messages to Slack using data
 
 ## Overview
 
-The `lambda-slack` project allows you to set up notifications about various events. It can process any event that you can trigger within the AWS ecosystem and send the payload to AWS Lambda—including payloads received through an API Gateway, which means you are not even tied to AWS. If you can perform an HTTP request and send some data, `lamdba-slack` can work with that too.
+The `lambda-slack` project allows you to set up notifications about various events. It can process any event that you can trigger within the AWS ecosystem and send the payload to AWS Lambda—including payloads received through an API Gateway, which means you are not even tied to AWS. If you can perform an HTTP request and send some data, `lamdba-slack` can work with that, too.
 
 ### Set up notifications from various sources
 
@@ -21,7 +21,7 @@ Here are a few example use-cases:
 
 You have full control over how messages are delivered:
 
-* Channel, username, avatar image, text, attachments—everything that [the amazing Slack API](https://api.slack.com/docs/message-formatting) supports can be customized.
+* Slack channel, username, avatar image, text, attachments—everything that [the amazing Slack API](https://api.slack.com/docs/message-formatting) supports can be customized.
 * Different messages can be sent based on rules, i.e. build success vs. build failure can trigger messages with slightly different content.
 * You can set up several notification types using a single configuration file.
 
@@ -30,6 +30,14 @@ Check out [`config.example.json`](https://github.com/balintk/lambda-slack/blob/m
 ### Deploy easily to AWS Lambda
 
 `lambda-slack` utilizes [Serverless](https://serverless.com) under the hood to faciliate easy and quick deployments to AWS Lambda.
+
+## Usage
+
+1. Clone this repository and install packages with `$ npm install` (or `$ yarn install`).
+2. Create your `config.json` file. (See [`config.example.json`](https://github.com/balintk/lambda-slack/blob/master/config.example.json) and [Configuration](#configuration).)
+3. Test your function with `$ node src/test_run.js path-to-payload.json`. (See [Testing](#testing).)
+4. Create your function in AWS Lambda and set up authentication credentials. (See [Initial setup](#initial-setup).)
+5. Deploy with `$ npm run deploy`. (See [Deployment](#deployment).)
 
 ## Configuration
 
@@ -79,19 +87,19 @@ An example match rules definition would be:
 
 These match rules would return `true` with the above payload.
 
-Match rules are defined as an object. Keys describe paths within the payload where values should be checked. They are expressed with the dot notation and a preceding `$` symbol. Values should be arrays containing the possible values. If any of the values are found at the path the key defines, the rule will return `true`. All rules need to return `true` in order to have a `true` returned as the result of the evaluation. (In other words match rules are evaluated with the logical `AND` operator, but values inside rules are checked with `OR`.)
+Match rules are defined as an object. Keys describe paths within the payload where values should be checked. They are expressed as path definitions. Values should be arrays containing the possible values. If any of the values are found at the path the key defines, the rule will return `true`. All rules need to return `true` in order to have a `true` returned as the final result of the evaluation. (In other words match rules are evaluated with the logical `AND` operator, but values inside rules are checked with `OR`.)
 
 #### Notification object
 
-With *path definitions* and *match rules* we have established a vocabulary to define a notification object.
+With *[path definitions](#path-definition)* and *[match rules](#match-rules)* we have established a vocabulary to define a notification object.
 
 
 |Property|Description|
 |--------|-----------|
-|`name`|Name of the notification. It helps you to identify your notification and will show up in the logs that will belong to your AWS Lambda function.|
+|`name`|Name of the notification. It helps you identify your notification and will show up in the logs that will belong to your AWS Lambda function.|
 |`match`|Optional match rules object. Determines if the notification should be selected for delivery.|
-|`variables`.|Optional object to define variables that can be used as replacement tokens in values that are sent to Slack. Keys should be the desired variable names, values should be path definitions against the payload. The extracted values will be assigned to the variables. Variables can also have different values assigned based on match rules. In this case, instead of a simple path definition, you can define an object where keys are the possible values. For each key you should include match rules under a `match` key.|
-|`slackMessage`|The message that will be sent to Slack. Check out Slack's [message builder](https://api.slack.com/docs/messages/builder) and [documentation](https://api.slack.com/docs/message-formatting) to learn about the required format.|
+|`variables`|Optional object to define variables that can be used as replacement tokens in values that are sent to Slack. Keys should be the desired variable names, values should be path definitions against the payload. The extracted values will be assigned to the variables. Variables can also have different values assigned based on match rules. In this case, instead of a simple path definition, you can define an object where keys are the possible values. For each key you should include match rules under a `match` key.|
+|`slackMessage`|The message that will be sent to Slack. Variables can be used as tokens written between the `<` and `>` symbols. Check out Slack's [message builder](https://api.slack.com/docs/messages/builder) and [documentation](https://api.slack.com/docs/message-formatting) to learn about the required format.|
 
 ##### Example
 
@@ -148,11 +156,11 @@ With *path definitions* and *match rules* we have established a vocabulary to de
     }]
   }
 }
-``````
+```
 
 ## Testing
 
-After creating your config file, you can do a test run locally using a sample JSON-formatted payload file. There are samples in the repository, but you can create the payload file for yourself to match your events that you will be receiving.
+After creating your config file, you can do a test run locally using a sample JSON-formatted payload file. There are samples in the repository, but you can create the payload file for yourself to mock your events that you will be receiving.
 
 To perform a test run, issue the following command:
 
@@ -177,7 +185,7 @@ Now you're ready to deploy your function using [Serverless](https://serverless.c
 
 (Or if you prefer, use `$ yarn deploy`.)
 
-With this single command you can deploy a new version of your function. Whenever you change your configuration just issue this command, and your function will be shipped to AWS Lambda in a few seconds.
+With this single command you can deploy a new version of your function. Whenever you change your configuration, just issue this command, and your function will be shipped to AWS Lambda in a few seconds.
 
 ## Development
 
