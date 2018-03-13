@@ -2,6 +2,29 @@
 
 AWS Lambda function for sending highly customizable messages to Slack using data from any kind of payload, i.e. CloudWatch events or HTTP requests received through API Gateway endpoints.
 
+## Table of Contents
+
+* [Overview](#overview)
+    * [Set up notifications from various sources](#set-up-notifications-from-various-sources)
+    * [Compose your own messages](#compose-your-own-messages)
+    * [Deploy easily to AWS Lambda](#deploy-easily-to-aws-lambda)
+* [Usage](#usage)
+* [Configuration](#configuration)
+    * [Anatomy of a notification](#anatomy-of-a-notification)
+      * [Path definition](#path-definition)
+      * [Match rules](#match-rules)
+      * [Notification object](#notification-object)
+          * [Example](#example)
+* [Testing](#testing)
+* [Deployment to AWS Lambda](#deployment-to-aws-lambda)
+    * [Initial setup](#initial-setup)
+    * [Deployment](#deployment)
+* [Development](#development)
+    * [Bundling](#bundling)
+    * [Linting](#linting)
+      * [Testing](#testing-1)
+* [License](#license)
+
 ## Overview
 
 The `lambda-slack` project allows you to set up notifications about various events. It can process any event that you can trigger within the AWS ecosystem and send the payload to AWS Lambda—including payloads received through an API Gateway, which means you are not even tied to AWS. If you can perform an HTTP request and send some data, `lamdba-slack` can work with that, too.
